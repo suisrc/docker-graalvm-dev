@@ -6,7 +6,7 @@
 # rm -rf .git && git init # 清除git并且重新初始化git
 version: "3.7"
 services:
-  java-dev:
+  graalvm-dev:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -17,7 +17,7 @@ services:
         OH_MY_ZSH_SH_URL: https://gitee.com/ncr/ohmyzsh/raw/sc/tools/install.sh
         OH_MY_ZSH_SUGGES: https://gitee.com/ncr/zsh-autosuggestions
     image: suisrc/graalvm-dev:v0.0.001
-    container_name: java-dev
+    container_name: graalvm-dev
     environment:
     - GIT_USER_NAME=suisrc
     - GIT_USER_EMAIL=z@suisrc.cn
