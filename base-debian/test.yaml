@@ -1,0 +1,11 @@
+# docker-compose -f base.test.yaml build
+version: "3.7"
+services:
+  java-dev:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        LINUX_MIRRORS: http://mirrors.aliyun.com
+        GRAALVM_PKG: http://172.17.0.1:9010/github/graalvm-ce-java8-linux-amd64-19.3.1.tar.gz
+    image: suisrc/graalvm:19.3.1-java8-debian
