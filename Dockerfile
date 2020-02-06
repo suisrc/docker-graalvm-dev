@@ -1,5 +1,4 @@
-# https://hub.docker.com/r/oracle/graalvm-ce/dockerfile
-FROM oracle/graalvm-ce:19.3.1-java8
+FROM suisrc/graalvm:19.3.1-java8-debian
 # args
 ARG CODE_RELEASE
 ARG FONT_URL
@@ -8,6 +7,8 @@ ARG CODE_URL
 ARG OH_MY_ZSH_SH_URL
 ARG OH_MY_ZSH_SUGGES
 ARG LINUX_MIRRORS
+ARG JAVA_RELEASE
+ARG JAVA_URL
 ARG MAVEN_RELEASE
 ARG MAVEN_URL
 
@@ -16,11 +17,22 @@ LABEL maintainer="suisrc@outlook.com"
 
 ENV container docker
 # linux and softs
-# yum makecache && yum update -y &&\
 RUN echo "**** update linux and install softs ****" && \
-    yum install -y \
+    if [ ! -z ${LINUX_MIRRORS+x} ]; then \
+        mv /etc/apt/sources.list /etc/apt/sources.list.bak && \
+        echo "deb ${LINUX_MIRRORS}/debian/ stretch main non-free contrib" >>/etc/apt/sources.list &&\
+        echo "deb-src ${LINUX_MIRRORS}/debian/ stretch main non-free contrib" >>/etc/apt/sources.list &&\
+        echo "deb ${LINUX_MIRRORS}/debian-security stretch/updates main" >>/etc/apt/sources.list &&\
+        echo "deb-src ${LINUX_MIRRORS}/debian-security stretch/updates main" >>/etc/apt/sources.list &&\
+        echo "deb ${LINUX_MIRRORS}/debian/ stretch-updates main non-free contrib" >>/etc/apt/sources.list &&\
+        echo "deb-src ${LINUX_MIRRORS}/debian/ stretch-updates main non-free contrib" >>/etc/apt/sources.list &&\
+        echo "deb ${LINUX_MIRRORS}/debian/ stretch-backports main non-free contrib" >>/etc/apt/sources.list &&\
+        echo "deb-src ${LINUX_MIRRORS}/debian/ stretch-backports main non-free contrib" >>/etc/apt/sources.list; \
+    fi &&\
+    apt-get update && \
+    apt-get install --no-install-recommends -y \
+        dumb-init \
         sudo \
-        curl \
         git \
         jq \
         net-tools \
@@ -29,9 +41,9 @@ RUN echo "**** update linux and install softs ****" && \
         p7zip \
         nano \
         fontconfig \
-        ntpdate && \
-    rm -rf /tmp/* /var/tmp/* 
-    #rm -rf /var/cache/yum
+        ntpdate \
+        locales && \
+    rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 # mvn
 RUN echo "**** install maven ****" &&\
@@ -62,7 +74,7 @@ RUN echo "**** install sarasa-gothic fonts ****" && \
     curl -o /tmp/sarasa-gothic-ttf.7z -L "${FONT_URL}" && \
     mkdir -p /usr/share/fonts/truetype/sarasa-gothic &&\
     cd /usr/share/fonts/truetype/sarasa-gothic &&\
-    7za x /tmp/sarasa-gothic-ttf.7z &&\
+    p7zip --uncompress /tmp/sarasa-gothic-ttf.7z &&\
     fc-cache -f -v &&\
     rm -rf /tmp/*
 
@@ -97,8 +109,7 @@ RUN echo "**** install code-server ****" && \
 
 # install code server extension
 ENV SERVICE_URL=https://marketplace.visualstudio.com/_apis/public/gallery \
-    ITEM_URL=https://marketplace.visualstudio.com/items \
-    NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-bundle.crt
+    ITEM_URL=https://marketplace.visualstudio.com/items
 
 RUN echo "**** install code-server extension ****" && \
     code-server --install-extension ms-ceintl.vscode-language-pack-zh-hans &&\
@@ -115,12 +126,9 @@ COPY ["settings.json", "locale.json", "/root/.local/share/code-server/User/"]
 ADD  "settings.xml" "/root/.m2/settings.xml"
 
 # locale & language
-# localectl set-locale LANG=zh_CN.UTF-8
-# localectl set-locale LANG=zh_CN.UTF-8
-#RUN yum install kde-l10n-Chinese -y &&\
-#    sed -i "s/n_US.UTF-8/zh_CN.UTF-8/g" /etc/locale.conf
-#ENV LANG="zh_CN.UTF-8" \
-#    SHELL=/bin/zsh
+RUN sed -i "s/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/g" /etc/locale.gen && locale-gen
+ENV LC_ALL=zh_CN.UTF-8 \
+    SHELL=/bin/zsh
 
 COPY entrypoint.sh /usr/local/bin/
 
@@ -130,8 +138,8 @@ WORKDIR  /home/project
 #VOLUME [ "/home/project" ]
 
 # code-server start
-EXPOSE 7778
-ENTRYPOINT ["entrypoint.sh"]
+EXPOSE 7779
+ENTRYPOINT ["dumb-init", "entrypoint.sh"]
 CMD [ "code-server", "--host", "0.0.0.0", "--port", "7779", "--disable-telemetry", "--disable-updates", "/home/project"]
 
 

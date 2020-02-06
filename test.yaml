@@ -11,13 +11,12 @@ services:
       context: ./
       dockerfile: Dockerfile
       args:
-        #LINUX_MIRRORS: mirrors.tuna.tsinghua.edu.cn
         MAVEN_URL: http://172.17.0.1:9010/github/apache-maven-3.6.2-bin.tar.gz
         FONT_URL: http://172.17.0.1:9010/github/fonts/sarasa-gothic-ttf-0.10.2-sc.7z
         CODE_URL: http://172.17.0.1:9010/github/code-server2.1698-vsc1.41.1-linux-x86_64.tar.gz
         OH_MY_ZSH_SH_URL: https://gitee.com/ncr/ohmyzsh/raw/sc/tools/install.sh
         OH_MY_ZSH_SUGGES: https://gitee.com/ncr/zsh-autosuggestions
-    image: suisrc/java-dev:v0.0.001
+    image: suisrc/graalvm-dev:v0.0.001
     container_name: java-dev
     environment:
     - GIT_USER_NAME=suisrc
