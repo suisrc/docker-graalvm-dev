@@ -27,7 +27,7 @@ RUN echo "**** update linux ****" && \
     fi &&\
     apt-get update &&\
     apt-get install -y --no-install-recommends ca-certificates curl jq gcc libz-dev &&\
-    apt-get autoremove -y && apt-get clean &&\
+    apt-get clean &&\
     rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 # install oracle graalvm-ce 
@@ -43,9 +43,9 @@ RUN echo "**** install graalvm-ce ****" &&\
     fi &&\
     mkdir -p /graalvm &&\
     #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\
-    curl -fsSLO --compressed ${GRAALVM_URL} -o /tmp/graalvm-ce.tar.gz &&\
-    tar -xzf /tmp/graalvm-ce.tar.gz -C /graalvm --strip-components 1 &&\
-    rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* &&\
+    curl -fsSLO --compressed ${GRAALVM_URL} -o graalvm-ce.tar.gz &&\
+    tar -xzf graalvm-ce.tar.gz -C /graalvm --strip-components 1 &&\
+    rm -f graalvm-ce.tar.gz &&\
     # smoke tests
     java -version
 
