@@ -50,6 +50,9 @@ RUN echo "**** install graalvm-ce ****" &&\
 ENV PATH=/graalvm/bin:$PATH
 RUN gu install native-image
 
+ENV JDK_HOME=/graalvm
+ENV JAVA_HOME=/graalvm
+
 # mvn
 RUN echo "**** install maven ****" &&\
     if [ -z ${MAVEN_URL+x} ]; then \
