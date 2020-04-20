@@ -63,7 +63,7 @@ jobs:
 #          docker push $IMAGE_ID:$VERSION
   push-graalvm:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'vm-')
+    #if: startsWith(github.ref, 'vm-')
 
     steps:
       - uses: actions/checkout@v2
