@@ -42,9 +42,9 @@ RUN echo "**** install graalvm-ce ****" &&\
             | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-java8-linux")) | .browser_download_url'); \
     fi &&\
     mkdir -p /graalvm &&\
-    #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\
+    #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components=1 &&\
     curl -fsSLO --compressed ${GRAALVM_URL} -o graalvm-ce.tar.gz &&\
-    tar -xzf graalvm-ce.tar.gz -C /graalvm --strip-components 1 &&\
+    tar -xzf graalvm-ce.tar.gz -C /graalvm --strip-components=1 &&\
     rm -f graalvm-ce.tar.gz &&\
     # smoke tests
     java -version
