@@ -1,0 +1,88 @@
+name: Docker
+
+on:
+  release:
+    types: [published]
+
+env:
+  DOCKER_IMAGE_NAME: suisrc/vscode
+  DOCKER_IMAGE_VERSION_SUFFIX: -dev-graal
+
+jobs:
+  push-centos:
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.ref, 'vm-')"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build . --file centos.Dockerfile --tag image
+
+      - name: Push docker image
+        run: |
+          REGISTRY_URL=docker.io
+          IMAGE_OS=centos7
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login $REGISTRY_URL -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+          IMAGE_ID=$REGISTRY_URL/$DOCKER_IMAGE_NAME
+          echo IMAGE_ID=$IMAGE_ID
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')-$IMAGE_OS$DOCKER_IMAGE_VERSION_SUFFIX
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+  push-debian:
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.ref, 'vm-')"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build . --file debian.Dockerfile --tag image
+
+      - name: Push docker image
+        run: |
+          REGISTRY_URL=docker.io
+          IMAGE_OS=debian9
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login $REGISTRY_URL -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+          IMAGE_ID=$REGISTRY_URL/$DOCKER_IMAGE_NAME
+          echo IMAGE_ID=$IMAGE_ID
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')-$IMAGE_OS$DOCKER_IMAGE_VERSION_SUFFIX
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+  push-graalvm:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'vm-')
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build ./graalvm --file ./graalvm/debian.Dockerfile --tag image
+
+      - name: Push docker image
+        run: |
+          REGISTRY_URL=docker.io
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login $REGISTRY_URL -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+          IMAGE_ID=$REGISTRY_URL/suisrc/graalvm
+          echo IMAGE_ID=$IMAGE_ID
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^vm-//')
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
