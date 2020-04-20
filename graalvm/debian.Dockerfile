@@ -56,10 +56,10 @@ RUN echo "**** install maven ****" &&\
         MAVEN_URL="https://downloads.apache.org/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz"; \
     fi &&\
     mkdir -p /usr/share/maven &&\
-    curl -L ${MAVEN_URL} -o /tmp/apache-maven.tar.gz &&\
-    tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 &&\
+    curl -fsSL ${MAVEN_URL} -o apache-maven.tar.gz &&\
+    tar -xzf apache-maven.tar.gz -C /usr/share/maven --strip-components=1 &&\
+    rm -f apache-maven.tar.gz &&\
     ln -s /usr/share/maven/bin/mvn /usr/bin/mvn &&\
-    rm -rf /tmp/* &&\
     # smoke tests
     mvn -version
 

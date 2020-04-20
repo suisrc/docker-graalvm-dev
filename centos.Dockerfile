@@ -22,28 +22,24 @@ RUN echo "**** install graalvm-ce ****" &&\
             | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-java8-linux")) | .browser_download_url'); \
     fi &&\
     mkdir -p /graalvm &&\
-    #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\
-    curl -fsSLO --compressed ${GRAALVM_URL} -o /tmp/graalvm-ce.tar.gz &&\
-    tar -xzf /tmp/graalvm-ce.tar.gz -C /graalvm --strip-components 1 &&\
-    rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* &&\
-    # smoke tests
-    java -version
+    #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components=1 &&\
+    curl -fsSL --compressed ${GRAALVM_URL} -o graalvm-ce.tar.gz &&\
+    tar -xzf graalvm-ce.tar.gz -C /graalvm --strip-components=1 &&\
+    rm -f graalvm-ce.tar.gz
 
 ENV PATH=/graalvm/bin:$PATH
 RUN gu install native-image
 
 # mvn
-# http://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz"
-# https://downloads.apache.org/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz
 RUN echo "**** install maven ****" &&\
     if [ -z ${MAVEN_URL+x} ]; then \
         MAVEN_URL="https://downloads.apache.org/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz"; \
     fi &&\
     mkdir -p /usr/share/maven &&\
-    curl -L ${MAVEN_URL} -o /tmp/apache-maven.tar.gz &&\
-    tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 &&\
+    curl -fsSL ${MAVEN_URL} -o apache-maven.tar.gz &&\
+    tar -xzf apache-maven.tar.gz -C /usr/share/maven --strip-components=1 &&\
+    rm -f apache-maven.tar.gz &&\
     ln -s /usr/share/maven/bin/mvn /usr/bin/mvn &&\
-    rm -rf /tmp/* &&\
     # smoke tests
     mvn -version
 
