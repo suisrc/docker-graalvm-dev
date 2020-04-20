@@ -11,8 +11,6 @@ ARG GRAALVM_URL
 ARG MAVEN_RELEASE=3.6.3
 ARG MAVEN_URL
 
-ENV GRAALVM_JDK java8
-
 RUN apt-get update && apt-get install -y gcc libz-dev && \
     apt-get autoremove -y && apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
@@ -25,7 +23,7 @@ RUN echo "**** install graalvm-ce ****" &&\
             | awk '/tag_name/{print $4;exit}' FS='[""]'); \
         fi && \
         GRAALVM_URL=$(curl -sX GET "https://api.github.com/repos/graalvm/graalvm-ce-builds/releases/tags/${GRAALVM_RELEASE}" \
-            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-${GRAALVM_JDK}-linux")) | .browser_download_url'); \
+            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-java8-linux")) | .browser_download_url'); \
     fi &&\
     mkdir -p /graalvm &&\
     #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\

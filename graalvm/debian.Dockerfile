@@ -9,8 +9,6 @@ ARG MAVEN_URL
 
 ARG LINUX_MIRRORS=http://mirrors.aliyun.com
 
-ENV GRAALVM_JDK java8
-
 LABEL maintainer="Y13 <suisrc@outlook.com>"
 
 # install oracle graalvm-ce 
@@ -41,7 +39,7 @@ RUN echo "**** install graalvm-ce ****" &&\
             | awk '/tag_name/{print $4;exit}' FS='[""]'); \
         fi && \
         GRAALVM_URL=$(curl -sX GET "https://api.github.com/repos/graalvm/graalvm-ce-builds/releases/tags/${GRAALVM_RELEASE}" \
-            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-${GRAALVM_JDK}-linux")) | .browser_download_url'); \
+            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-java8-linux")) | .browser_download_url'); \
     fi &&\
     mkdir -p /graalvm &&\
     #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\

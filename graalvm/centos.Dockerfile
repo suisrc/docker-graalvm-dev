@@ -1,8 +1,16 @@
 # debian镜像体积更小，更适合构建镜像， 所以推荐使用debian构建
 FROM centos:7
-LABEL maintainer="Y13 <suisrc@outlook.com>"
+
+# args
+ARG GRAALVM_RELEASE
+ARG GRAALVM_URL
+
+ARG MAVEN_RELEASE=3.6.3
+ARG MAVEN_URL
 
 ARG LINUX_MIRRORS=http://mirrors.aliyun.com
+
+LABEL maintainer="Y13 <suisrc@outlook.com>"
 
 RUN echo "**** update linux ****" && \
     set -eux &&\
@@ -26,7 +34,7 @@ RUN echo "**** install graalvm-ce ****" &&\
             | awk '/tag_name/{print $4;exit}' FS='[""]'); \
         fi && \
         GRAALVM_URL=$(curl -sX GET "https://api.github.com/repos/graalvm/graalvm-ce-builds/releases/tags/${GRAALVM_RELEASE}" \
-            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-${GRAALVM_JDK}-linux")) | .browser_download_url'); \
+            | jq -r '.assets[] | select(.browser_download_url | contains("graalvm-ce-java8-linux")) | .browser_download_url'); \
     fi &&\
     mkdir -p /graalvm &&\
     #curl `#--fail --silent --location --retry 3` -fSL ${GRAALVM_URL} | tar -zxC /graalvm --strip-components 1 &&\
