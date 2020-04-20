@@ -14,7 +14,7 @@ RUN echo "**** update linux ****" && \
         curl -fsSL ${LINUX_MIRRORS}/repo/epel-7.repo -o /etc/yum.repos.d/epel.repo; \
     fi &&\
     yum clean all && yum makecache && yum update -y &&\
-    yum install -y curl gcc libz-dev && \
+    yum install -y curl jq gcc libz-dev && \
     rm -rf /tmp/* /var/tmp/* /var/cache/yum
 
 # install oracle graalvm-ce 

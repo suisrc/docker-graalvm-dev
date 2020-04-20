@@ -28,7 +28,7 @@ RUN echo "**** update linux ****" && \
         echo "deb-src ${LINUX_MIRRORS}/debian/ stretch-backports main non-free contrib" >>/etc/apt/sources.list; \
     fi &&\
     apt-get update &&\
-    apt-get install -y --no-install-recommends ca-certificates curl gcc libz-dev &&\
+    apt-get install -y --no-install-recommends ca-certificates curl jq gcc libz-dev &&\
     apt-get autoremove -y && apt-get clean &&\
     rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
