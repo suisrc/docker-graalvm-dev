@@ -63,28 +63,25 @@ jobs:
 #          docker push $IMAGE_ID:$VERSION
   push-graalvm:
     runs-on: ubuntu-latest
-    #if: startsWith(github.ref, 'vm-')
+    if: startsWith(github.ref, 'refs/tags/vm-')
 
     steps:
       - uses: actions/checkout@v2
-      - name: test
-        run: echo ref=${{ github.ref }} && echo github=${{ github }}
 
-#      - name: Build image
-#        run: |
-#          docker build ./graalvm --file ./graalvm/debian.Dockerfile --tag image
-#
-#      - name: Push docker image
-#        run: |
-#          REGISTRY_URL=docker.io
-#          echo "${{ secrets.DOCKER_TOKEN }}" | docker login $REGISTRY_URL -u ${{ secrets.DOCKER_USER }} --password-stdin
-#
-#          IMAGE_ID=$REGISTRY_URL/suisrc/graalvm
-#          echo IMAGE_ID=$IMAGE_ID
-#
-#          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-#          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^vm-//')
-#          echo VERSION=$VERSION
-#
-#          docker tag image $IMAGE_ID:$VERSION
-#          docker push $IMAGE_ID:$VERSION
+      - name: Build image
+        run: |
+          docker build ./graalvm --file ./graalvm/debian.Dockerfile --tag image
+
+      - name: Push docker image
+        run: |
+          REGISTRY_URL=docker.io
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login $REGISTRY_URL -u ${{ secrets.DOCKER_USER }} --password-stdin
+
+          IMAGE_ID=$REGISTRY_URL/suisrc/graalvm
+          echo IMAGE_ID=$IMAGE_ID
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,' | sed -e 's/^vm-//')
+          echo VERSION=$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
